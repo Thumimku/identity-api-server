@@ -1,0 +1,775 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **Remote Fetch Configuration RESTful API** for
+    **WSO2 Identity Server**. This supports Restful APIs for reomtefetch
+    configuration management. The APIs provide the capability to
+    add/update/delete/patch remotefetch configurations in the identity server.
+    In addition, APIs are available to trigger revision deployement for given
+    remote fetch configuration.
+  version: "v1.1-oas3"
+  title: WSO2 Identity Server - Remotedetch Configuration Management API definition
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - OAuth2: []
+  - BasicAuth: []
+paths:
+  /remote-fetch/configs:
+    get:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        List remote fetch configurations
+      description: >
+        This API provides the capability to retrieve the list of remotefetch
+        configurations.<br> <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: getRemoteFetchConfigs
+      parameters:
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteFetchConfigurationListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        Add a new remotefetch configuration
+      description: >
+        This API provides the capability to create a new remotefetch
+        configuration. <br>
+
+        <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: addRemoteFetchConfig
+      responses:
+        '201':
+          description: Successfully created.
+          headers:
+            Location:
+              description: Location of the newly created remotefetch configuration.
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoteFetchConfigurationPOSTRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RemoteFetchConfigurationPOSTRequest'
+        description: This represents the remotefetch configuration to be created.
+        required: true
+  '/remote-fetch/configs/{id}':
+    get:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        Retrieve remotefetch Configuration by remotefetch Configuration's ID
+      description: >
+        This API provides the capability to retrieve the Remote Fetch
+        Configuration details by using its ID.<br> <b>Permission required:</b>
+        <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: getRemoteFetchConfig
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remotefetch Configuration.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteFetchConfigurationGetResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RemoteFetchConfigurationGetResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        Patch a remotefetch Configuration property by ID.
+      description: >
+        This API provides the capability to update a remotefetch Configuration
+        property using patch request. Patch is supported only for key-value
+        pairs. <br> <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: updateRemoteFetchConfig
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remotefetch Configuration.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully Updated
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoteFetchConfigurationPatchRequest'
+        required: true
+    delete:
+      tags:
+        - Remote Fetch Configurations
+      summary: >
+        Delete a remotefetch Configuration by using the remotefetch
+        Configuration's ID.
+      description: >
+        This API provides the capability to delete a remotefetch Configuration
+        by giving its ID. <br> <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: deleteRemoteFetchConfig
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remotefetch Configuration
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully Deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/remote-fetch/configs/{id}/trigger':
+    post:
+      tags:
+        - Trigger
+      summary: |
+        Trigger a remote fetch configuration.
+      description: >
+        This API pprovides the capability to trigger given remotefetch
+        configuration. <br> <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: triggerRemoteFetch
+      parameters:
+        - name: id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully created.
+          headers:
+            Location:
+              description: Location of the triggered remotefetch configuration.
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/remote-fetch/configs/{id}/status':
+    get:
+      tags:
+        - Remote fetch Configuration Status
+      summary: |
+        Deployment status of remotefetch configuration.
+      description: >
+        This API provides the status of remote fetch configuration. The status
+        hold deployment status and the deployment failure details . <br>
+        <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: getStatus
+      parameters:
+        - name: id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/remote-fetch/configs/attributes':
+    get:
+      tags:
+        - Remote fetch Configuration Status
+      summary: |
+        Deployment status of remotefetch configuration.
+      description: >
+        This API provides the status of remote fetch configuration. The status
+        hold deployment status and the deployment failure details . <br>
+        <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: getAllComponentUIFields
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllComponentUIFieldsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: 'https://virtserver.swaggerhub.com/Thumimku/Remotedetch/v1'
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: carbon.super
+components:
+  parameters:
+    limitQueryParam:
+      in: query
+      name: limit
+      required: false
+      description: |
+        Maximum number of records to return.
+      schema:
+        type: integer
+        format: int32
+    offsetQueryParam:
+      in: query
+      name: offset
+      required: false
+      description: |
+        Number of records to skip for pagination.
+      schema:
+        type: integer
+        format: int32
+    filterQueryParam:
+      in: query
+      name: filter
+      required: false
+      description: >
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew'
+        and 'eq' operations and also complex queries with 'and' operations. E.g.
+        /identity-providers?filter=name+sw+"google"+and+isEnabled+eq+"true"
+      schema:
+        type: string
+    sortQueryParam:
+      in: query
+      name: sortOrder
+      required: false
+      description: |
+        Defines the order in which the retrieved records should be sorted.
+        _This parameter is not supported yet_
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
+    sortByQueryParam:
+      in: query
+      name: sortBy
+      required: false
+      description: |
+        Attribute by which the retrieved records should be sorted.
+        _This parameter is not supported yet_
+      schema:
+        type: string
+    requiredAttributesQueryParam:
+      in: query
+      name: requiredAttributes
+      required: false
+      description: |
+        Specifies the required parameters in the response.
+        _This parameter is not supported yet_
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: RFE-00000
+        message:
+          type: string
+          example: Some Error Message
+        description:
+          type: string
+          example: Some Error Description
+        traceId:
+          type: string
+          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+          description: Path to the target resource.
+          example: '''/t/carbon.super/api/server/v1/reomtefetch-configss/1'''
+        rel:
+          type: string
+          description: Describes how the current context is related to the target resource.
+          example: reomtefetch-configurations
+      readOnly: true
+    AllComponentUIFieldsResponse:
+      type: object
+      properties:
+        actionListener:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentUIFieldsResponse'
+        repositoryManager:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentUIFieldsResponse'
+        configDeployer:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentUIFieldsResponse'
+    ComponentUIFieldsResponse:
+      type: object
+      properties:
+        identifier:
+          type: string
+          example: 'POLLING'
+        UIFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/UIFieldResponse'
+    UIFieldResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'frequency'
+        type:
+          type: string
+          example: 'TEXT_BOX'
+        displayName:
+          type: string
+          example: 'Polling Frequency'
+        helpText:
+          type: string
+          example: 'Number of seconds polling should occur'
+        validationRegex:
+          type: string
+          example: '^\d+$'
+        defaultValues:
+          type: array
+          items:
+            type: string
+            example: '60'
+        isMandatory:
+          type: boolean
+          default: true
+          example: true
+        isSensitive:
+          type: boolean
+          default: true
+          example: true
+        isMultiValue:
+          type: boolean
+          default: true
+          example: true
+    RemoteFetchConfigurationListResponse:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          example: 10
+        startIndex:
+          type: integer
+          example: 1
+        count:
+          type: integer
+          example: 10
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            - href: remotefetch/configs?offset=50&limit=10
+              rel: next
+            - href: reomtefetch/configs?offset=30&limit=10
+              rel: previous
+        remotefetchConfigurations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemoteFetchConfigurationListItem'
+    StatusListResponse:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          example: 10
+        startIndex:
+          type: integer
+          example: 1
+        count:
+          type: integer
+          example: 10
+        successfulDeployments:
+          type: integer
+          example: 1
+        failedDeployments:
+          type: integer
+          example: 1
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            - href: status?offset=50&limit=10
+              rel: next
+            - href: status?offset=30&limit=10
+              rel: previous
+        remoteFetchRevisionStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusListItem'
+    RemoteFetchConfigurationListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 00000000-13e9-4ed5-afaf-000000000000
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        remoteFetchName:
+          type: string
+          example: testSP
+        repositoryManagerType:
+          type: string
+          example: GIT
+        actionListenerType:
+          type: string
+          example: POOLING
+        configurationDeployerType:
+          type: string
+          example: SP
+        successfulDeployments:
+          type: integer
+          example: 1
+        failedDeployments:
+          type: integer
+          example: 1
+        lastDeployed:
+          type: string
+          example: 10-04-2020
+    StatusListItem:
+      type: object
+      properties:
+        itemName:
+          type: string
+          example: pickup
+        deployedTime:
+          type: string
+          example: '2020-03-29 07:36:08.0'
+        deployedStatus:
+          type: string
+          example: DEPLOYED
+        deploymentErrorReport:
+          type: string
+          example: "Service Provider Deployment Error Occured"
+    RemoteFetchConfigurationPOSTRequest:
+      type: object
+      properties:
+        remoteFetchName:
+          type: string
+          example: testSP
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        repositoryManagerAttributes:
+          $ref: '#/components/schemas/RepositoryManagerAttributes'
+        actionListenerAttributes:
+          $ref: '#/components/schemas/ActionListenerAttributes'
+        configurationDeployerAttributes:
+          $ref: '#/components/schemas/ConfigurationDeployerAttributes'
+    RemoteFetchConfigurationPatchRequest:
+      type: object
+      properties:
+        remoteFetchName:
+          type: string
+          example: testSP
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+    RepositoryManagerAttributes:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: sample access token
+        userName:
+          type: string
+          example: Jhon Doe
+        uri:
+          type: string
+          example: 'https://github.com/TestUser/TestGit.git'
+        branch:
+          type: string
+          example: master
+        directory:
+          type: string
+          example: SP/
+    ActionListenerAttributes:
+      type: object
+      properties:
+        frequency:
+          type: string
+          example: 60
+    ConfigurationDeployerAttributes:
+      type: object
+    RemoteFetchConfigurationGetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 00000000-13e9-4ed5-afaf-000000000000
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        remoteFetchName:
+          type: string
+          example: testSP
+        repositoryManagerType:
+          type: string
+          example: GIT
+        actionListenerType:
+          type: string
+          example: POOLING
+        configurationDeployerType:
+          type: string
+          example: SP
+        repositoryManagerAttributes:
+          $ref: '#/components/schemas/RepositoryManagerAttributes'
+        actionListenerAttributes:
+          $ref: '#/components/schemas/ActionListenerAttributes'
+        configurationDeployerAttributes:
+          $ref: '#/components/schemas/ConfigurationDeployerAttributes'
