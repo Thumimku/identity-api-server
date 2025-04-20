@@ -1,0 +1,434 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies **The Authorization API** for
+    **WSO2 Identity Server**. This enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs)
+    to communicate authorization requests and decisions. This specification includes both the
+    Evaluation API for single access decisions and the Evaluations API for batch access decisions.
+  version: "v1"
+  title: WSO2 Identity Server - PDP API definition
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/identity/access/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: "default"
+
+paths:
+  /evaluation:
+    post:
+      tags:
+        - Evaluation
+      summary: Single Access Evaluation
+      description: >
+        Evaluate whether a subject is authorized to perform an action on a resource.
+      operationId: evaluateAccess
+      requestBody:
+        description: Access evaluation request object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessEvaluationRequest'
+      responses:
+        '200':
+          description: Access evaluation response object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessEvaluationResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /evaluations:
+    post:
+      tags:
+        - Evaluation
+      summary: Batch Access Evaluation
+      description: >
+        Evaluate multiple access requests in a single batch operation.
+      operationId: evaluateBatchAccess
+      requestBody:
+        description: Batch access evaluation request object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchAccessEvaluationRequest'
+      responses:
+        '200':
+          description: Batch access evaluation response object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAccessEvaluationResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /search/subject:
+    post:
+      tags:
+        - Search
+      summary: Search for subjects
+      description: >
+        Discover subject(s) based on attributes. Returns a list of matching subject identifiers and metadata.
+      operationId: searchSubject
+      requestBody:
+        description: Subject search request based on attribute filters.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectSearchRequest'
+      responses:
+        '200':
+          description: A list of matching subject identifiers and metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectSearchResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /search/resource:
+    post:
+      tags:
+        - Search
+      summary: Search for resource
+      description: >
+        Discover resource(s) based on attributes. Returns a list of matching resource identifiers and metadata.
+      operationId: searchResource
+      requestBody:
+        description: resource search request based on attributes.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceSearchRequest'
+      responses:
+        '200':
+          description: A list of matching subject identifiers and metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceSearchResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /search/action:
+    post:
+      tags:
+        - Search
+      summary: Search for Action
+      description: >
+        Discover actions based on attributes. Returns a list of matching actions and metadata.
+      operationId: searchAction
+      requestBody:
+        description: resource search request based on attributes.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionSearchRequest'
+      responses:
+        '200':
+          description: A list of matching subject identifiers and metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSearchResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+
+components:
+  schemas:
+    AccessEvaluationRequest:
+      type: object
+      required:
+        - subject
+        - resource
+        - action
+      properties:
+        subject:
+          $ref: '#/components/schemas/Subject'
+        resource:
+          $ref: '#/components/schemas/Resource'
+        action:
+          $ref: '#/components/schemas/Action'
+        context:
+          $ref: '#/components/schemas/Context'
+      additionalProperties: false
+
+    AccessEvaluationResponse:
+      type: object
+      required:
+        - decision
+      properties:
+        decision:
+          type: boolean
+          description: The result of the access evaluation. `true` represents "Permit", `false` represents "Deny".
+        context:
+          type: object
+          description: Additional context or reasons for the decision.
+          properties:
+            id:
+              type: string
+              description: Identifier for the decision context.
+            reason_admin:
+              type: object
+              description: Administrative reason for the decision, not intended for end-user exposure.
+            reason_user:
+              type: object
+              description: User-facing reason for the decision.
+      additionalProperties: false
+
+    BatchAccessEvaluationRequest:
+      type: object
+      required:
+        - evaluations
+      properties:
+        subject:
+          $ref: '#/components/schemas/Subject'
+        resource:
+          $ref: '#/components/schemas/Resource'
+        action:
+          $ref: '#/components/schemas/Action'
+        context:
+          $ref: '#/components/schemas/Context'
+        evaluations:
+          type: array
+          items:
+            type: object
+            properties:
+              subject:
+                $ref: '#/components/schemas/Subject'
+              resource:
+                $ref: '#/components/schemas/Resource'
+              action:
+                $ref: '#/components/schemas/Action'
+              context:
+                $ref: '#/components/schemas/Context'
+            required:
+              - resource
+              - action
+          description: A list of access evaluation requests. Each request may inherit default values from the top-level subject, resource, action, and context properties.
+      additionalProperties: false
+
+    BatchAccessEvaluationResponse:
+      type: object
+      required:
+        - evaluations
+      properties:
+        evaluations:
+          type: array
+          items:
+            type: object
+            properties:
+              decision:
+                type: boolean
+                description: The result of the access evaluation. `true` represents "Permit", `false` represents "Deny".
+              context:
+                type: object
+                description: Additional context or reasons for the decision.
+                properties:
+                  id:
+                    type: string
+                    description: Identifier for the decision context.
+                  reason_admin:
+                    type: object
+                    description: Administrative reason for the decision, not intended for end-user exposure.
+                  reason_user:
+                    type: object
+                    description: User-facing reason for the decision.
+            required:
+              - decision
+          description: A list of access evaluation responses corresponding to each request in the evaluations array.
+      additionalProperties: false
+
+    Subject:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: The type of the subject (e.g., user, service).
+        id:
+          type: string
+          description: The unique identifier of the subject.
+        properties:
+          type: object
+          description: Additional attributes of the subject.
+          additionalProperties: true
+      additionalProperties: false
+
+    Resource:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: The type of the resource (e.g., document, database).
+        id:
+          type: string
+          description: The unique identifier of the resource.
+        properties:
+          type: object
+          description: Additional attributes of the resource.
+          additionalProperties: true
+      additionalProperties: false
+
+    Action:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the action (e.g., read, write).
+        properties:
+          type: object
+          description: Additional attributes of the action.
+          additionalProperties: true
+      additionalProperties: false
+
+    SubjectSearchRequest:
+      type: object
+      required:
+        - subject
+        - resource
+        - action
+      properties:
+        subject:
+          $ref: '#/components/schemas/Subject'
+        resource:
+          $ref: '#/components/schemas/Resource'
+        action:
+          $ref: '#/components/schemas/Action'
+        context:
+          $ref: '#/components/schemas/Context'
+        page:
+          $ref: '#/components/schemas/Page'
+      additionalProperties: false
+
+    SubjectSearchResponse:
+      type: object
+      required:
+        - results
+        - page
+      properties:
+        results:
+          type: array
+          description: List of matching subjects.
+          items:
+            $ref: '#/components/schemas/Subject'
+        page:
+          $ref: '#/components/schemas/Page'
+      example:
+        results:
+          - type: user
+            id: alice@wso2.com
+          - type: user
+            id: bob@wso2.com
+        page:
+          next_token: ""
+      additionalProperties: false
+
+    ResourceSearchRequest:
+      type: object
+      required:
+        - subject
+        - resource
+        - action
+      properties:
+        subject:
+          $ref: '#/components/schemas/Subject'
+        resource:
+          $ref: '#/components/schemas/Resource'
+        action:
+          $ref: '#/components/schemas/Action'
+        context:
+          $ref: '#/components/schemas/Context'
+        page:
+          $ref: '#/components/schemas/Page'
+      additionalProperties: false
+
+    ResourceSearchResponse:
+      type: object
+      required:
+        - results
+        - page
+      properties:
+        results:
+          type: array
+          description: List of matching subjects.
+          items:
+            $ref: '#/components/schemas/Resource'
+        page:
+          $ref: '#/components/schemas/Page'
+      additionalProperties: false
+
+    ActionSearchRequest:
+      type: object
+      required:
+        - subject
+        - resource
+      properties:
+        subject:
+          $ref: '#/components/schemas/Subject'
+        resource:
+          $ref: '#/components/schemas/Resource'
+        context:
+          $ref: '#/components/schemas/Context'
+        page:
+          $ref: '#/components/schemas/Page'
+      additionalProperties: false
+
+    ActionSearchResponse:
+      type: object
+      required:
+        - results
+        - page
+      properties:
+        results:
+          type: array
+          description: List of matching subjects.
+          items:
+            $ref: '#/components/schemas/Action'
+        page:
+          $ref: '#/components/schemas/Page'
+      additionalProperties: false
+
+    Context:
+      type: object
+      description: Environmental or contextual information relevant to the access request.
+      additionalProperties: true
+
+    Page:
+      type: object
+      description: A page token for paged requests.
+      additionalProperties: true
